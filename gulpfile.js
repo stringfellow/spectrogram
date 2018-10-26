@@ -35,7 +35,7 @@ gulp.task('templates', function() {
 		console.log(error);
 		this.emit('end');
 	})
-	.pipe(gulp.dest('./build'))
+	.pipe(gulp.dest('./build'));
 });
 gulp.task('images', function() {
   return gulp.src('./src/images/**/*')
@@ -97,6 +97,7 @@ gulp.task('iconfont', function(){
 gulp.task('webserver', function() {
   gulp.src('./build')
     .pipe(webserver({
+      host: '0.0.0.0',
       livereload: true,
       open: true,
       fallback: 'index.html'

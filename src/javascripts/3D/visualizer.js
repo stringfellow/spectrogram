@@ -400,13 +400,16 @@ AnalyserView.prototype.drawGL = function() {
 		var discretizedYOffset = Math.floor(normalizedYOffset * (sonogram3DHeight - 1)) / (sonogram3DHeight - 1);
 
 		gl.uniform1f(sonogram3DShader.vertexYOffsetLoc, discretizedYOffset);
-		gl.uniform1f(sonogram3DShader.verticalScaleLoc, sonogram3DGeometrySize / 3.5 );
+    // sets the z-height of the render:
+		gl.uniform1f(sonogram3DShader.verticalScaleLoc, sonogram3DGeometrySize / 3 );
 
 		// Set up the model, view and projection matrices
 		projection.loadIdentity();
-		projection.perspective(55 /*35*/, canvas.width / canvas.height, 1, 100);
+    // 
+		projection.perspective(100, 1/*, canvas.width / canvas.height*/, 1, 100);
 		view.loadIdentity();
-		view.translate(0, 0, -9.0 /*-13.0*/);
+    // Changing the last number here 'zooms' in (-1 is v close)
+		view.translate(0, 0, -5);
 
 		// Add in camera controller's rotation
 		model.loadIdentity();

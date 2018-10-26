@@ -74,6 +74,19 @@ $(function(){
 		});
 	}
 
+  var playLive = function(sp) {
+    /* Start the mic and render. */
+    sp.startRender();
+    
+    var wasPlaying = sp.isPlaying();
+    sp.stop();
+    sp.drawingMode = false;
+
+    $('#record').fadeIn().delay(2000).fadeOut();
+    // Start Recording ****************************************
+    sp.live();
+  };
+
 	var startup = function (){
         var source = null; // global source for user dropped audio
 
@@ -85,44 +98,6 @@ $(function(){
 		// --------------------------------------------
 		$('.music-box__tool-tip').hide(0);
 		$('#loadingSound').hide(0);
-
-		$('.music-box__buttons__button').click(function(e){
-			sp.startRender();
-			
-			var wasPlaying = sp.isPlaying();
-			sp.stop();
-			sp.drawingMode = false;
-			
-			if($(this).hasClass('selected')) {
-				$('.music-box__buttons__button').removeClass('selected'); 
-			}else{
-				$('.music-box__buttons__button').removeClass('selected'); 
-				$(this).addClass('selected');
-				// check for start recoding data instruction **********************
-				if ($(this).attr('data-mic')!== undefined) {
-					if(window.isIOS){
-						// Throw Microphone Error *********************************
-						window.parent.postMessage('error2','*');
-						// Remove Selection ***************************************
-						$(this).removeClass('selected');
-					}else{
-						// Show Record Modal Screen *******************************
-						$('#record').fadeIn().delay(2000).fadeOut();
-						// Start Recording ****************************************
-						sp.live();
-					}
-				// Check for Start drawing data instruction  **********************
-				}else if ($(this).attr('data-draw') !== undefined) {
-					sp.drawingMode = true;
-					$('#drawAnywhere').fadeIn().delay(2000).fadeOut();
-				// Check for play audio data instruction **************************
-				}else if ($(this).attr('data-src') !== undefined) {
-					sp.loopChanged( true );
-					$('#loadingMessage').text($(this).attr('data-name'));
-					sp.play($(this).attr('data-src'));
-				}
-			}
-		})
 		
 		var killSound = function(){
 			sp.startRender();
@@ -133,93 +108,14 @@ $(function(){
 		}
 
 		window.addEventListener('blur', function() {
-		   killSound();
+		   // killSound();
 		});
 		document.addEventListener('visibilitychange', function(){
-		    killSound();
+		    // killSound();
 		});
 
-        var decodeBuffer = function(file) {
-            // Credit: https://github.com/kylestetz/AudioDrop && https://ericbidelman.tumblr.com/post/13471195250/web-audio-api-how-to-playing-audio-based-on-user
-            var AudioContext = window.AudioContext || window.webkitAudioContext;
-            var context = new AudioContext();
-            // var source = null;
-            var audioBuffer = null;
-            var fileReader = new FileReader();
+    playLive(sp);
 
-            fileReader.onload = function(fileEvent) {
-                var data = fileEvent.target.result;
-
-                context.decodeAudioData(data, function(buffer) {
-                    // audioBuffer is global to reuse the decoded audio later.
-                    audioBuffer = buffer;
-                    source = context.createBufferSource();
-                    source.buffer = audioBuffer;
-                    source.loop = true;
-                    source.connect(context.destination);
-
-                    // Visualizer
-                    sp.startRender();
-                    sp.loopChanged( true );
-                    sp.userAudio(source);
-                    $('#loadingSound').delay(500).fadeOut().hide(0);
-                }, function(e) {
-                    console.log('Error decoding file', e);
-                });
-            };
-
-            fileReader.readAsArrayBuffer(file);
-        };
-
-        var fileDrop = function() {
-            var $fileDrop = $('#fileDrop');
-            var $description = $('.file-overlay-description');
-
-            $(window).on({'dragover': function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                $description.text('Drop your sound file here.');
-                $fileDrop.addClass('active');
-            }, 'dragleave': function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                $fileDrop.removeClass('active');
-            }, 'drop': function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                $fileDrop.addClass('pointer-events');
-
-                // Stop other sounds
-                killSound();
-
-                var droppedFiles = e.originalEvent.dataTransfer;
-                if (droppedFiles && droppedFiles.files.length && droppedFiles.items[0] && droppedFiles.items[0].type !== 'audio/midi') {
-                    $.each(droppedFiles.files, function(i, file) {
-                        if (file.type.indexOf('audio') > -1) {
-                            $('#loadingMessage').text(file.name);
-                            $('#loadingSound').show(0);
-                            decodeBuffer(file);
-                            $fileDrop.removeClass('active');
-                            $fileDrop.removeClass('pointer-events');
-                        } else {
-                            $description.text('Only sound files will work here.');
-						}
-                    });
-                } else {
-                    $description.text('Only sound files will work here.');
-				}
-            } });
-
-            $fileDrop.on('click', function() {
-                $fileDrop.removeClass('active');
-                $fileDrop.removeClass('pointer-events');
-			});
-        };
-
-        fileDrop();
 	};
 
 	var elm = $('#iosButton');

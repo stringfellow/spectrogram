@@ -108,10 +108,6 @@ Player.prototype.playHelper_ = function(src) {
 };
 
 Player.prototype.live = function() {
-	if(window.isIOS){
-		window.parent.postMessage('error2','*');
-		console.log("cant use mic on ios");
-	}else{
 		if (this.input) {
 			this.input.disconnect();
 			this.input = null;
@@ -126,7 +122,6 @@ Player.prototype.live = function() {
 		});
 
 		this.filterGain.gain.value = 0;
-	}
 };
 
 Player.prototype.onStream_ = function(stream) {

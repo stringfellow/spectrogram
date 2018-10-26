@@ -178,9 +178,7 @@ var spec3D = {
     // Draw a simple legend.
     var canvas = $('#legend')[0];
     var ctx = canvas.getContext('2d');
-    var x = canvas.width - 10;
-
-
+    var x = canvas.width;
 
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '14px Roboto';
